@@ -1,0 +1,16 @@
+---
+- name: Build WPT Server Image,
+  docker_image:
+    path: ../wpt-server
+    name: wpt-server
+  become: true
+
+- name: Build WPT Agent Image.
+  docker_image:
+    path: ../wpt-agent
+    name: wpt-agent
+  become: true
+
+- name: Create backend network.
+  docker_network:
+    name: wpt-backenddock

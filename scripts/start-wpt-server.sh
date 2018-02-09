@@ -1,0 +1,1 @@
+docker container run -d -p 80:80 --name wpt-server --network wpt-backend wpt-server

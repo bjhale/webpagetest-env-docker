@@ -1,0 +1,86 @@
+---
+
+- name: Install prerequisites
+  yum:
+    name: "{{item}}"
+    state: latest
+  become: true
+  with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    - python-pip
+
+- name: Add Docker repository.
+  command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+      creates: /etc/yum.repos.d/docker-ce.repo
+  become: true
+
+- name: Install Dockerdoc
+  yum:
+    name: docker-ce
+    state: latest
+  become: true
+
+- name: Enable docker
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+  become: true
+
+- name: Install Docker Compose.
+  get_url:
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+    dest: "{{ docker_compose_path }}"
+    mode: 0755
+  become: true
+
+- name: Install docker-py.
+  pip:
+    name: docker-py
+    umask: "0022"
+  become: true
+
+
+
+
+# - name: Add Docker GPG key.
+#  rpm_key:
+#    key: https://download.docker.com/linux/centos/gpg
+#    state: present
+#  become: true
+
+#- name: Add Docker repository.
+#  get_url:
+#    url: "{{ docker_yum_repo_url }}"
+#    dest: '/etc/yum.repos.d/docker-{{ docker_edition }}.repo'
+#    owner: root
+#    group: root
+#    mode: 0644
+#  become: true
+
+#- name: Configure Docker Edge repo.
+#  ini_file:
+#    dest: '/etc/yum.repos.d/docker-{{ docker_edition }}.repo'
+#   section: 'docker-{{ docker_edition }}-edge'
+#    option: enabled
+#    value: '{{ docker_yum_repo_enable_edge }}'
+#  become: true
+
+#- name: Install Docker.
+#  package:
+#    name: "{{ docker_package }}"
+#    state: present
+#  become: true
+
+#- name: Ensure Docker is started and enabled at boot.
+#  service:
+#    name: docker
+#    state: started
+#    enabled: yes
+#  become: true
+
+#- include_tasks: docker-compose.yml
+#  when: docker_install_compose
